@@ -1,6 +1,6 @@
 const zlib = require('zlib')
 const winston = require('winston')
-require('winston-papertrail')
+const { PapertrailTransport } = require('winston-papertrail-transport')
 
 const unarchiveLogData = async (payload) => {
   const rawData = await new Promise((resolve, reject) => {
@@ -46,16 +46,13 @@ exports.handler = async (event, context, callback) => {
     const payload = Buffer.from(event.awslogs.data, 'base64')
 
     const logData = await unarchiveLogData(payload)
-      
-    const papertrailTransport = new winston.transports.Papertrail({
+
+    const papertrailTransport = new PapertrailTransport({
       host,
       port,
-      program: logData.logStream,
-      hostname: logData.logGroup,
-      flushOnClose: true,
-      colorize: true,
     })
-    const logger = new (winston.Logger)({
+
+    const logger = winston.createLogger({
       transports: [papertrailTransport],
     })
 
@@ -64,7 +61,7 @@ exports.handler = async (event, context, callback) => {
 
       logger.log(logLevel, event.message)
     })
-    logger.close()
+    logger.end()
     
   } catch (error) {
     callback(error)
