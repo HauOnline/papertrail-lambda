@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/HauOnline/papertrail-lambda#readme",
   "dependencies": {
-    "axios": "^0.21.2"
+    "axios": "^1.6.0"
   }
 }
